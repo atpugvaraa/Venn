@@ -1,48 +1,81 @@
 import SwiftUI
 
+enum ExpandState: Equatable {
+    case collapsed
+    case partial
+    case full
+}
+
 struct ContentView: View {
     @State private var router = Router()
     
-//    @State private var bottomPadding: CGFloat = 0
-    @State private var swipedUp = false
+    @State private var expansionState: ExpandState = .collapsed
     
     var body: some View {
         VStack {
-            GeometryReader { geo in
-                let size = geo.size
-                
-                VennDiagram(viewWidth: size.width, viewHeight: size.height)
-            }
-            .background(.blue.opacity(0.5))
-            .clipShape(ContainerRelativeShape())
+            diagram
             
-            if swipedUp {
-                HStack {
-                    Circle()
-                        .frame(width: 20, height: 20)
-                    
-                    Text("Task 1")
-                }
-                .frame(height: 48)
-                .transition(.move(edge: .bottom))
-            }
+            expandableTaskPanel
         }
         .ignoresSafeArea()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
-        .gesture (
-            DragGesture()
-                .onChanged { value in
-                    print(value.translation.height)
+        .gesture(stateGesture)
+        .sensoryFeedback(.impact, trigger: expansionState)
+        .animation(.smooth, value: expansionState)
+    }
+    
+    var diagram: some View {
+        GeometryReader { geo in
+            let size = geo.size
+            
+            VennDiagram(viewWidth: size.width, viewHeight: size.height)
+        }
+        .background(.blue.opacity(0.5))
+        .clipShape(ContainerRelativeShape())
+    }
+    
+    var expandableTaskPanel: some View {
+        Group {
+            if !(expansionState == .collapsed) {
+                VStack {
+                    if expansionState == .full {
+                        AllTasksView()
+                    }
                     
-                    swipedUp = value.translation.height < 0
+                    if expansionState == .partial || expansionState == .full {
+                        AddTaskButton()
+                    }
                 }
-                .onEnded { value in
-                    
+            }
+        }
+        .padding([.horizontal, .bottom])
+        .transition(.move(edge: .bottom))
+    }
+    
+    var stateGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                print(value.translation.height)
+            }
+            .onEnded { value in
+                switch expansionState {
+                case .collapsed:
+                    if value.translation.height < 0 {
+                        expansionState = .partial
+                    }
+                case .partial:
+                    if value.translation.height < 0 {
+                        expansionState = .full
+                    } else {
+                        expansionState = .collapsed
+                    }
+                case .full:
+                    if value.translation.height > 0 {
+                        expansionState = .partial
+                    }
                 }
-        )
-        .sensoryFeedback(.impact, trigger: swipedUp)
-        .animation(.smooth, value: swipedUp)
+            }
     }
 }
 

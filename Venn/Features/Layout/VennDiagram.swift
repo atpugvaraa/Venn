@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-struct SetRegion: Hashable {
-    let center: CGPoint
-    let radius: CGFloat
-}
-
 struct VennDiagram: View {
     var viewWidth: CGFloat
     var viewHeight: CGFloat
