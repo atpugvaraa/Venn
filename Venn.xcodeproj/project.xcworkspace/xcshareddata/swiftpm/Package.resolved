@@ -1,0 +1,15 @@
+{
+  "originHash" : "32092efb4089040cf9826052b6444664235931c42b17c8300282f3570c309612",
+  "pins" : [
+    {
+      "identity" : "swiftui-atom-properties",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ra1028/swiftui-atom-properties",
+      "state" : {
+        "revision" : "ee5a01d289f46be85b20dbd1298f8c3ae8176b06",
+        "version" : "0.8.3"
+      }
+    }
+  ],
+  "version" : 3
+}
